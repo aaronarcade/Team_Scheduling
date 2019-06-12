@@ -2,8 +2,9 @@
 from gurobipy import GRB,Model
 import pprint, csv
 
-
-# clean csv
+#===================
+#==== clean csv ====
+#===================
 
 
 members = []
@@ -77,18 +78,14 @@ for mem in members:
 from gurobipy import *
 
 # Number of workers required for each shift
-shifts = ["T1","T2"]
+projects = ["T1","T2"]
 recs = [2,2]
 
-# shiftsRecs = {}
-# for i in range(0,len(shifts)):
-#     shiftsRecs[shifts[i]] = recs[i]
+proj_requirements = {}
+for i in range(0,len(projects)):
+    proj_requirements[projects[i]] = recs[i]
 
-projects, proj_requirements = multidict({
-  "T1":  2,
-  "T2":  2 })
-
-# Amount each worker is paid to work one shift
+# Amount each worker is paid to work one shift # need to associate with a team
 workers, pay = multidict({
   "Amy":   1,
   "Bob":   2 })
@@ -108,7 +105,7 @@ x = m.addVars(availability, ub=1, name="x")
 m.setObjective(quicksum(pay[w]*x[w,s] for w,s in availability), GRB.MAXIMIZE)
 
 # Constraints: assign exactly shiftRequirements[s] workers to each shift s
-reqCts = m.addConstrs((x.sum('*', s) <= proj_requirements[s] for s in projects), "_")
+reqCts = m.addConstrs((x.sum('*', s) <= proj_requirements[s] for s in proj_requirements.keys()), "_")
 
 # Using Python looping constructs, the preceding statement would be...
 #
