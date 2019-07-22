@@ -17,11 +17,13 @@ shifts, shiftRequirements = multidict({
 # Amount each worker is paid to work one shift
 workers, pay = multidict({
   "Amy":   1,
-  "Bob":   2 })
+  "Bob":   2,
+  "Cat":   1,
+  "Dan":   1 })
 
 # Worker availability
 availability = tuplelist([
-('Amy', 'T2'), ('Bob', 'T1'), ('Amy', 'T1')])
+('Amy', 'T2'), ('Bob', 'T1'), ('Amy', 'T1'), ('Cat', 'T2')])
 
 # Model
 m = Model("assignment")
