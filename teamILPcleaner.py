@@ -1,4 +1,5 @@
 import csv, pprint
+import pandas as pd
 
 noprojects=9
 
@@ -17,14 +18,14 @@ def clean(noprojects):
             proj_pref = {}
             for proj in range(20, 20+noprojects):
                 if 'VERY' in row[proj]:
-                    proj_pref[headers[proj]] = 3
-                    teamlist[headers[proj]][2]+=1
-                elif 'Interested' in row[proj]:
+                    proj_pref[headers[proj]] = 1
+                    teamlist[headers[proj]][0]+=1
+                elif 'Mildly' not in row[proj]:
                     proj_pref[headers[proj]] = 2
                     teamlist[headers[proj]][1]+=1
                 elif 'Mildly' in row[proj]:
-                    proj_pref[headers[proj]] = 1
-                    teamlist[headers[proj]][0]+=1
+                    proj_pref[headers[proj]] = 3
+                    teamlist[headers[proj]][2]+=1
 
             #make year numeric
             if 'First' in row[9]:
@@ -51,7 +52,6 @@ def clean(noprojects):
     #solve for average year among all members
     avg_year = round(avg_year/len(members),4)
     return members, teamlist, avg_year
-members, teamlist, avg_year = clean(9)
 
 def firstchoices(members, teamlist):
     #find smallest first choice list
@@ -139,8 +139,30 @@ if len(members)!=0:
         members, teamlist = thirdchoices(members, teamlist)
 while len(members)!=0:
     members, teamlist = lastchoice(members, teamlist)
+
+##uncomment below for final list
 # pprint.pprint(teamlist)
 
-for t in teamlist:
-    throw it back in a csv
+#============================================
+#==== pull all info on person and export ====
+#============================================
+dt, tocsv = [], []
+with open('DummyApplicationResponses_preclean.csv', 'r', encoding='utf-8') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    header = next(reader, None)
+    header.insert(0,'Team')
+    for row in reader:
+        dt.append(row)
 
+    for team in teamlist:
+        for member in teamlist[team][3]:
+            for r in range(0, len(dt)):
+                if member==dt[r][2]:
+                    dt[r].insert(0,team)
+                    tocsv.append(dt[r])
+
+with open('teams_sorted.csv', 'w') as csvfile:
+    writer = csv.writer(csvfile, dialect='excel', quoting=csv.QUOTE_NONNUMERIC)
+    writer.writerow(header)
+    for row in tocsv:
+        writer.writerow(row)
